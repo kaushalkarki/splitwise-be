@@ -8,6 +8,15 @@ class UsersController < ApplicationController
     end
   end
 
+  def show
+    @user = User.find(params[:id])
+    if @user.present?
+      render json: {user: @user}
+    else
+      render json: {error: "No user found"}
+    end
+  end
+
   def update
     @user = User.find(params[:id])
 
