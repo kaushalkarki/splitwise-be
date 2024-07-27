@@ -27,6 +27,11 @@ class UsersController < ApplicationController
     end
   end
 
+  def get_users_group
+    user = User.find_by(id: params[:id])
+    render json: {groups: user.groups}
+  end
+
   private
 
   def user_params
