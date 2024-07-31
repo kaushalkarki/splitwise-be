@@ -16,6 +16,7 @@ Rails.application.routes.draw do
     member do
       get 'get_group_users'
       get 'expenses'
+      get 'balances'
     end
   end
   resources :expenses
