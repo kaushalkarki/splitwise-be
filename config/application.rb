@@ -16,6 +16,8 @@ module SplitwiseBe
     # Common ones are `templates`, `generators`, or `middleware`, for example.
     config.autoload_lib(ignore: %w(assets tasks))
     config.time_zone = 'Kolkata'
+    config.middleware.use ActionDispatch::Cookies
+    config.middleware.use ActionDispatch::Session::CookieStore, key: '_your_app_session'
     config.middleware.insert_before 0, Rack::Cors do
       allow do
         origins '*'  # Change this to the domain of your frontend

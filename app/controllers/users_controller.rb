@@ -32,6 +32,11 @@ class UsersController < ApplicationController
     render json: {groups: user.groups}
   end
 
+  def send_email
+    @user = User.first
+    UserMailer.welcome_email(@user).deliver_now
+  end
+
   private
 
   def user_params
