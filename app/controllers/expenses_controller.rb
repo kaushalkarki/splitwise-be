@@ -1,4 +1,5 @@
 class ExpensesController < ApplicationController
+  before_action :set_expense, only: [:destroy]
   
   def create
     splits_details = params[:transaction][:expense_split]
@@ -13,11 +14,22 @@ class ExpensesController < ApplicationController
 
   end
 
+  def destroy
+    if @expense.destroy
+      render json: {message: "Successfully deleted"}
+    else
+      render json: {error: "Failed to delete entry"}
+    end
+  end
+
   private
 
   def transaction_params
     params.require(:transaction).permit(:description, :amount, :group_id, :payer, :transaction_date, :expense_split)
   end
   
+  def set_expense
+    @expense = Expense.find(params[:id])
+  end
   
 end
