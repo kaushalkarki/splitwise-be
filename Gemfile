@@ -26,6 +26,8 @@ gem 'rack-cors', require: 'rack/cors'
 gem 'jwt'
 gem 'dotenv-rails'
 gem 'google-id-token'
+gem 'cloudinary'
+gem 'carrierwave'
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem "tzinfo-data", platforms: %i[ windows jruby ]
