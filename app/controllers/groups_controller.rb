@@ -19,8 +19,13 @@ class GroupsController < ApplicationController
   end
 
   def expenses
+    limit = params[:limit] || 2
+    page = params[:page] || 1
     group_id = params[:id]
     data = Expense.includes(:expense_splits).where(group_id: group_id).order(transaction_date: :desc)
+    total_expenses = data.count
+    data = data.page(page).per(limit)
+
     render json: {
       expenses: data.as_json(
         include: {
@@ -29,7 +34,12 @@ class GroupsController < ApplicationController
           }
         },
         only: [:id, :description, :amount, :payer, :transaction_date]
-      )
+      ),
+      meta: {
+        count: total_expenses,
+        page: page,
+        per_page: limit
+      }
     }
   end
 
