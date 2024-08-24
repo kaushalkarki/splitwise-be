@@ -1,0 +1,2 @@
+class Settle < ApplicationRecord
+end

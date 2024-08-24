@@ -37,6 +37,11 @@ class UsersController < ApplicationController
     UserMailer.welcome_email(@user).deliver_now
   end
 
+  def users_with_name
+    user = User.all.select(:id, :name)
+    render json: { user: user }, status: :ok
+  end
+
   private
 
   def user_params

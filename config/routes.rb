@@ -12,12 +12,16 @@ Rails.application.routes.draw do
     member do
       get 'get_users_group'
     end
+    collection do
+      get 'users_with_name'
+    end
   end
   resources :groups do
     member do
       get 'get_group_users'
       get 'expenses'
       get 'balances'
+      get 'settle_up'
     end
   end
   resources :expenses

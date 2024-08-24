@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_08_01_150529) do
+ActiveRecord::Schema[7.1].define(version: 2024_08_22_122007) do
   create_table "expense_splits", force: :cascade do |t|
     t.integer "expense_id"
     t.integer "user_id"
@@ -46,6 +46,16 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_01_150529) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "settles", force: :cascade do |t|
+    t.integer "sender", null: false
+    t.integer "receiver", null: false
+    t.integer "group_id"
+    t.float "amount", null: false
+    t.datetime "settle_date", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "name", null: false
     t.string "email", null: false
@@ -59,4 +69,6 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_01_150529) do
 
   add_foreign_key "group_subscriptions", "groups"
   add_foreign_key "group_subscriptions", "users"
+  add_foreign_key "settles", "users", column: "receiver"
+  add_foreign_key "settles", "users", column: "sender"
 end

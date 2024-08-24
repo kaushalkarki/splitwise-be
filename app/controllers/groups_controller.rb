@@ -49,8 +49,9 @@ class GroupsController < ApplicationController
     users = group.users.order(:name)
     total = []
     summary = []
-    users.each do |user| 
-      net = Expense.where(payer: user.id).sum(:amount) - ExpenseSplit.where(user_id: user.id).sum(:user_amount)
+    users.each do |user|
+      id = user.id 
+      net = Expense.where(payer: id).sum(:amount) - ExpenseSplit.where(user_id: id).sum(:user_amount) + Settle.where(sender: id).sum(:amount) - Settle.where(receiver:id).sum(:amount)
       total.push([user.id, user.name, net] )
     end
     total_copy = Marshal.load(Marshal.dump(total))
@@ -91,5 +92,23 @@ class GroupsController < ApplicationController
     end
   
     transactions
+  end
+
+  def settle_up
+    limit = params[:limit] || 2
+    page = params[:page] || 1
+    group_id = params[:id]
+    data = Settle.where(group_id: group_id).order(settle_date: :desc)
+    settlement_count = data.count
+    data = data.page(page).per(limit)
+
+    render json: {
+      settle: data,
+      meta: {
+        count: settlement_count,
+        page: page,
+        per_page: limit
+      }
+    }
   end
 end
