@@ -52,7 +52,7 @@ class GroupsController < ApplicationController
     users.each do |user|
       id = user.id 
       net = Expense.where(payer: id).sum(:amount) - ExpenseSplit.where(user_id: id).sum(:user_amount) + Settle.where(sender: id).sum(:amount) - Settle.where(receiver:id).sum(:amount)
-      total.push([user.id, user.name, net] )
+      total.push([user.id, net] )
     end
     total_copy = Marshal.load(Marshal.dump(total))
     transactions = settle_expenses(total_copy)
@@ -67,32 +67,33 @@ class GroupsController < ApplicationController
     transactions = []
   
     # Separate positive and negative balances
-    positive_balances = expenses.select { |expense| expense[2] > 0 }
-    negative_balances = expenses.select { |expense| expense[2] < 0 }
+    positive_balances = expenses.select { |expense| expense[1] > 0 }
+    negative_balances = expenses.select { |expense| expense[1] < 0 }
   
     pos_index = 0
     neg_index = 0
   
     while pos_index < positive_balances.length && neg_index < negative_balances.length
-      pos_id, pos_name, pos_value = positive_balances[pos_index]
-      neg_id, neg_name, neg_value = negative_balances[neg_index]
+      pos_id, pos_value = positive_balances[pos_index]
+      neg_id, neg_value = negative_balances[neg_index]
   
       transfer_amount = [pos_value, -neg_value].min
   
       # Update the balances
-      positive_balances[pos_index][2] -= transfer_amount
-      negative_balances[neg_index][2] += transfer_amount
+      positive_balances[pos_index][1] -= transfer_amount
+      negative_balances[neg_index][1] += transfer_amount
   
       # Log the transaction
-      transactions << { from: neg_name, to: pos_name, amount: transfer_amount }
+      transactions << { from: neg_id, to: pos_id, amount: transfer_amount }
   
       # Update the indices for the next iteration
-      pos_index += 1 if positive_balances[pos_index][2] == 0
-      neg_index += 1 if negative_balances[neg_index][2] == 0
+      pos_index += 1 if positive_balances[pos_index][1] == 0
+      neg_index += 1 if negative_balances[neg_index][1] == 0
     end
   
     transactions
   end
+  
 
   def settle_up
     limit = params[:limit] || 2
