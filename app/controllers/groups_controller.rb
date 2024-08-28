@@ -60,12 +60,14 @@ class GroupsController < ApplicationController
   def balances
     group_id = params[:id]
     group = Group.find_by(id: group_id)
+    query = Expense.where(group_id: group_id)
+    t_id = query.pluck(:id)
     users = group.users.order(:name)
     total = []
     summary = []
     users.each do |user|
       id = user.id 
-      net = Expense.where(payer: id).sum(:amount) - ExpenseSplit.where(user_id: id).sum(:user_amount) + Settle.where(sender: id).sum(:amount) - Settle.where(receiver:id).sum(:amount)
+      net = query.where(payer: id).sum(:amount) - ExpenseSplit.where(expense_id: t_id, user_id: id).sum(:user_amount) + Settle.where(group_id: group_id, sender: id).sum(:amount) - Settle.where(group_id: group_id, receiver:id).sum(:amount)
       total.push([user.id, net] )
     end
     total_copy = Marshal.load(Marshal.dump(total))
