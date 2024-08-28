@@ -12,6 +12,20 @@ class GroupsController < ApplicationController
     end
   end
 
+  def create
+    name = params[:group][:name]
+    emails = params[:group][:members]
+    group = Group.create(name: name)
+    user_ids = User.where(email: emails).pluck(:id)
+    user_ids.each do |id|
+      group.group_subscriptions.create(user_id: id)
+    end
+    
+    if group.save
+      render json:{group: group}
+    end
+  end
+
   def get_group_users
     group_id = params[:id]
     group = Group.find_by(id: group_id)
