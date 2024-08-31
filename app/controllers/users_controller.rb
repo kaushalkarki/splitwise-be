@@ -42,9 +42,47 @@ class UsersController < ApplicationController
     render json: { user: user }, status: :ok
   end
 
+  def dashboard_data
+    user_id = params[:id].to_i
+    results = []
+  
+    GroupSubscription.where(user_id: user_id).distinct.pluck(:group_id).each do |group_id|
+      query = Expense.where(group_id: group_id)
+      t_id = query.pluck(:id)
+      user_ids = GroupSubscription.where(group_id: group_id).distinct.pluck(:user_id)
+  
+      total = user_ids.map do |id|
+        net = calculate_net_balance(id, group_id, query, t_id)
+        [id, net]
+      end
+  
+      total_copy = Marshal.load(Marshal.dump(total))
+      transactions = Group.settle_expenses(total_copy)
+  
+      formatted_transactions = transactions.select { |transaction| transaction[:from] == user_id || transaction[:to] == user_id }
+      .map do |transaction|
+        if transaction[:from] == user_id || transaction[:to] == user_id 
+          {from: transaction[:from],to: transaction[:to],amount: transaction[:amount]}
+        end
+      end
+  
+      results << formatted_transactions
+    end
+  
+    render json: results.flatten(1)
+  end
+  
+
   private
 
   def user_params
     params.require(:user).permit(:name, :email, :phone, :password, :image)
+  end
+
+  def calculate_net_balance(id, group_id, query, t_id)
+    query.where(payer: id).sum(:amount) -
+      ExpenseSplit.where(expense_id: t_id, user_id: id).sum(:user_amount) +
+      Settle.where(group_id: group_id, sender: id).sum(:amount) -
+      Settle.where(group_id: group_id, receiver: id).sum(:amount)
   end
 end

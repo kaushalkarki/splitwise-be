@@ -11,6 +11,7 @@ Rails.application.routes.draw do
   resources :users do
     member do
       get 'get_users_group'
+      get 'dashboard_data'
     end
     collection do
       get 'users_with_name'
