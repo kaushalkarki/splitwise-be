@@ -1,9 +1,8 @@
 class UserMailer < ApplicationMailer
     default from: 'from@example.com'
   
-    def welcome_email(user)
-      @user = user
-      mail(to: @user.email, subject: 'Welcome to My Awesome Site')
+    def welcome_email(email)
+      mail(to: email, subject: 'Splits Invitation')
     end
   
     def notification_email(user)

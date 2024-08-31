@@ -33,8 +33,14 @@ class UsersController < ApplicationController
   end
 
   def send_email
-    @user = User.first
-    UserMailer.welcome_email(@user).deliver_now
+    email = params[:email]
+    user = User.where(email: email).exists?
+    if !user.present?
+      UserMailer.welcome_email(email).deliver_now
+      render json:{message: "Email has been sent successfully"}, status: :ok 
+    else
+      render json:{message: "User already exist"}, status: :ok 
+    end
   end
 
   def users_with_name

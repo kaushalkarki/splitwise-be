@@ -15,6 +15,7 @@ Rails.application.routes.draw do
     end
     collection do
       get 'users_with_name'
+      get 'send_email'
     end
   end
   resources :groups do
