@@ -1,4 +1,5 @@
 class GroupsController < ApplicationController
+  before_action :authorize_request
   def index
 
   end
