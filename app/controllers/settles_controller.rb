@@ -1,5 +1,5 @@
 class SettlesController < ApplicationController
-  before_action :set_settle, only: [:destroy]
+  before_action :set_settle, only: [:destroy, :update, :show]
 
   def create
     settle = Settle.create(settle_params)
@@ -7,6 +7,18 @@ class SettlesController < ApplicationController
       render json: {settle: settle}
     else
       render json: {error: "Failed to save entry"}
+    end
+  end
+
+  def show
+    render json: @settle 
+  end
+
+  def update
+    if @settle.update(settle_params)
+      render json: { settle: @settle }
+    else
+      render json: { error: "Failed to update entry" }, status: :unprocessable_entity
     end
   end
 
